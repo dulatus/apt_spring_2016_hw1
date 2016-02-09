@@ -2,11 +2,31 @@ from bottle import route, run, template
 import requests
 from bs4 import BeautifulSoup
 import os 
-
-
+import string
+import re
+URL1 = "http://public.mig.kz/"
+eur = ""
+usd = ""
+rub = ""
+non_decimal = re.compile(r'[^\d.]+')
 @route('/')
 def index():
-    return {"usd": 378, "eur": 415, "rub": 4.82}
+    resp = requests.get(URL1)
+    bs4 = BeautifulSoup(resp.content,"html.parser")
+    result = None
+    tags = bs4.find_all('h4')
+    for tag in tags:
+    	h4 =""
+    	ul = ""
+    	if tag.string =='usd':
+    		usd = non_decimal.sub("",tag.parent.p.string)
+    	if tag.string =='eur':
+    		eur = non_decimal.sub("",tag.parent.p.string)
+    	if tag.string =='rub':
+    		rub = non_decimal.sub("",tag.parent.p.string)
+    	
+    
+    return {"usd": usd, "eur": eur, "rub": rub}
 
 
 URL = "https://github.com/giAtSDU/apt_spring_2016_hw1"
